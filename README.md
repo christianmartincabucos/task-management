@@ -66,7 +66,7 @@ The frontend is located in the `frontend/` directory and is built using Nuxt.js.
    ```
 2. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 
 ---
@@ -82,7 +82,7 @@ Start the Laravel Sail environment:
 ### Frontend
 Start the Nuxt.js development server:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ---
@@ -105,7 +105,7 @@ Run the PHPUnit tests:
 
 1. Build the frontend for production:
    ```bash
-   npm run build
+   pnpm run build
    ```
 2. Deploy the backend and frontend to your server or containerized environment.
 
