@@ -10,7 +10,6 @@
             <main class="flex-1 p-10 overflow-auto">
                 <div class="max-w-3xl mx-auto">
                     <div v-if="store.tasks.length === 0" class="text-center py-20">
-                        <h2 class="text-3xl font-bold mb-6">What do you have in mind?</h2>
                         <TaskInput />
                     </div>
 
