@@ -92,7 +92,11 @@ npm run dev
 ### Backend
 Run the PHPUnit tests:
 ```bash
-./vendor/bin/sail test
+./vendor/bin/sail artisan config:cache
+```
+
+```
+./vendor/bin/sail pest
 ```
 
 ---
