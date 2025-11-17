@@ -1,6 +1,6 @@
 <template>
     <div class="app-frame flex flex-col">
-        <Header :onSearch="onSearch" :store="store" />
+        <Header />
 
         <div class="flex flex-1 overflow-hidden">
             <aside class="w-64 flex-shrink-0">
@@ -66,12 +66,6 @@
         if (!newText.value.trim()) return
         store.add(newText.value.trim())
         newText.value = ''
-    }
-
-    let debounceTimer: any
-    function onSearch() {
-        clearTimeout(debounceTimer)
-        debounceTimer = setTimeout(() => store.fetch(), 250)
     }
 
     function onDragStart(index: number) {
