@@ -67,22 +67,21 @@ import { useTaskStore } from '~/stores/useTaskStore'
 
 // Access the task store
 const store = useTaskStore()
-console.log('DateSidebar store date:', store.date)
 
 // Helper dates
-const today: string = new Date().toISOString().split('T')[0]
-const yesterday: string = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+const today: string = new Date().toISOString().split('T')[0] ?? ''
+const yesterday: string = new Date(Date.now() - 86400000).toISOString().split('T')[0] ?? ''
 
 // Generate dynamic dates for the current month
 const currentMonth = new Date().toLocaleString('default', { month: 'long' })
 const currentYear = new Date().getFullYear()
 
 // Utility function to format dates
-function formatDate(date: Date): string {
-    return date.toISOString().split('T')[0]
+const formatDate = (date: Date): string => {
+    return date.toISOString()?.split('T')[0] || ''
 }
 
-function formatLabel(date: Date): string {
+const formatLabel = (date: Date): string => {
     return date.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' })
 }
 
@@ -112,12 +111,12 @@ const lastWeek = computed(() => {
 // Generate 3rd week of the current month
 const thirdWeek = computed(() => {
     const days = []
-    const startOfMonth = new Date(currentYear, new Date().getMonth(), 1)
+    const startOfMonth = new Date(Date.UTC(currentYear, new Date().getMonth(), 1))
     const thirdWeekStart = new Date(startOfMonth)
-    thirdWeekStart.setDate(15) // Start from the 15th of the month
+    thirdWeekStart.setUTCDate(15) // Start from the 15th of the month
     for (let i = 0; i < 7; i++) {
         const date = new Date(thirdWeekStart)
-        date.setDate(thirdWeekStart.getDate() + i)
+        date.setUTCDate(thirdWeekStart.getUTCDate() + i)
         days.push({ value: formatDate(date), label: formatLabel(date) })
     }
     return days
