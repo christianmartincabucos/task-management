@@ -20,10 +20,14 @@ import { useAuthStore } from '~/stores/useAuthStore'
 
 const email = ref('')
 const password = ref('')
-const loginStore = useAuthStore()
+const authStore = useAuthStore()
 
 async function login() {
-    await loginStore.login(email.value, password.value)
+    await authStore.login(email.value, password.value)
+    
+    if (authStore.token) {
+        return navigateTo('/');
+    }
 }
 
 

@@ -1,95 +1,84 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useApi } from '~/composables/useApi'
 
-export const useAuthStore = defineStore('login', () => {
-    const token = ref<string | null>(null)
-    const errorMessage = ref<string | null>(null)
-    const api = useApi()
-    const router = useRouter()
-    const user = ref<any>(null)
-    const cookieToken = useCookie('token');
-    const isLoaded = ref(false);
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref<string | null>(null)
+  const user = ref<any>(null)
+  const errorMessage = ref<string | null>(null)
+  const isLoaded = ref(false)
+  const api = useApi()
 
-    const loadFromCookies = () => {
-        if (cookieToken.value) {
-          token.value = cookieToken.value;
-        }
-        isLoaded.value = true; // prevents hydration mismatches
-      }
-    
-    const login = async (email: string, password: string) => {
-        try {
-            const response = await api.login(email, password) as { access_token: string }
+  const cookieToken = useCookie<string | null>('token', {
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+  })
 
-            // Save the token in localStorage or sessionStorage (client-side only)
-            // token.value = response.access_token
-            cookieToken.value = response.access_token;
 
-            // if (process.client) {
-            //     sessionStorage.setItem('authToken', response.access_token)
-            // }
+  const loadFromCookies = () => {
+    token.value = cookieToken.value || null
+    isLoaded.value = true
+  }
 
-            // Clear any previous error messages
-            errorMessage.value = null
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.login(email, password) as { access_token: string }
 
-            // Navigate to the home page
-            router.push('/')
-        } catch (error) {
-            // Handle errors (e.g., invalid credentials)
-            errorMessage.value = String(error)
-        }
+      token.value = response.access_token
+      cookieToken.value = response.access_token
+
+      errorMessage.value = null
+
+    } catch (err: any) {
+      errorMessage.value = err?.message ?? 'Login failed'
+    }
+  }
+
+  const logout = async () => {
+    try {
+      await api.logout()
+
+      token.value = null
+      user.value = null
+      cookieToken.value = null
+      errorMessage.value = null
+
+      const { navigateTo } = await import('#app')
+      navigateTo('/login')
+    } catch (err: any) {
+      errorMessage.value = err?.message ?? 'Logout failed'
+    }
+  }
+
+  const fetchUser = async () => {
+    if (!token.value) {
+      user.value = null
+      return false
     }
 
-    const logout = async () => {
-        try {
-            await api.logout()
-
-            // Clear the token and reset the state
-            cookieToken.value = null
-            // if (process.client) {
-            //     sessionStorage.removeItem('authToken')
-            // }
-            errorMessage.value = null
-
-            // Navigate to the login page
-            router.push('/login')
-        } catch (error) {
-            errorMessage.value = error as string
-        }
+    try {
+      const { data } = await api.fetchUser() as { data: any }
+      user.value = data
+      errorMessage.value = null
+      return true
+    } catch (err: any) {
+      user.value = null
+      errorMessage.value = err?.message ?? 'Failed to fetch user'
+      return false
     }
+  }
 
-    const fetchUser = async () => {
-        try {
-            const { data } = await api.fetchUser() as { data: any }
-            user.value = data
-            errorMessage.value = null
-            return true
-        } catch (error) {
-            user.value = null
-            errorMessage.value = error instanceof Error ? error.message : String(error)
-            return false
-        }
-    }
+  return {
+    // state
+    token,
+    user,
+    errorMessage,
+    isLoaded,
 
-    // const isLoggedIn = () => {
-    //     if (process.client) {
-    //         const sessionToken = sessionStorage.getItem('authToken')
-    //         return !!token.value || !!sessionToken
-    //     }
-    //     return !!token.value
-    // }
-
-    return {
-        token,
-        errorMessage,
-        fetchUser,
-        // isLoggedIn,
-        loadFromCookies,
-        isLoaded,
-        user,
-        login,
-        logout,
-    }
+    // actions
+    loadFromCookies,
+    login,
+    logout,
+    fetchUser,
+  }
 })

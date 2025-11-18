@@ -4,8 +4,6 @@ export function useApi() {
     const auth = useAuthStore()
     const cookieToken = useCookie('token').value;
 
-    console.log('Cookie Token in useApi:', cookieToken);
-    
     const authHeader = ():Record<string, string> => {
         return cookieToken ? { Authorization: `Bearer ${cookieToken}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
     }
