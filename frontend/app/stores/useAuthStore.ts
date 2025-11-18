@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
       errorMessage.value = null
 
     } catch (err: any) {
-      errorMessage.value = err?.message ?? 'Login failed'
+      errorMessage.value = err?.message ?? 'Login failed. Invalid credentials.'
     }
   }
 

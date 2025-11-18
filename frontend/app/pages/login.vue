@@ -28,6 +28,8 @@ async function login() {
     if (authStore.token) {
         return navigateTo('/');
     }
+
+    alert(authStore.errorMessage || 'Login failed')
 }
 
 

@@ -10,7 +10,7 @@
 			<input v-model="store.search" placeholder="Search" class="ml-3 bg-transparent outline-none w-full" @input="onSearch" />
 		</div>
 
-		<div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+		<div class="w-8 h-8 bg-black rounded-full"></div>
 	</header>
 </template>
 <script setup lang="ts">
