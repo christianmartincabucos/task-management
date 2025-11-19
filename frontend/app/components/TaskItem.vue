@@ -1,57 +1,73 @@
 <template>
     <div class="flex items-center justify-between p-3 border rounded-xl mb-3 bg-white">
-        <div class="flex items-center gap-4">
+        <div class="w-full flex items-center gap-4">
+            <!-- Toggle Task Completion -->
             <button @click="toggle" :class="[{ 'bg-black text-white': task.is_done }, 'w-6 h-6 rounded-full border flex items-center justify-center']">
                 <span v-if="task.is_done">
                     <LucideCheck class="w-4 h-4" />
                 </span>
             </button>
-            <div :class="[{ 'line-through ': task.is_done }, 'cursor-pointer']" @click="edit = !edit">
+
+            <!-- Task Statement -->
+            <div v-if="editingTaskId !== task.id" :class="[{ 'line-through ': task.is_done }, 'cursor-pointer']" @click="startEditing">
                 {{ task.statement }}
             </div>
+            <input
+                v-else
+                v-model="editText"
+                class="w-full border p-2 rounded"
+                @blur="save"
+                @keyup.enter="save"
+                @keyup.esc="cancel"
+            />
         </div>
+
+        <!-- Delete Button -->
         <div class="flex items-center gap-3">
             <button @click="confirmDelete" title="Delete">
                 <LucideTrash2 />
             </button>
         </div>
     </div>
-
-    <div v-if="edit" class="mt-2">
-        <input v-model="editText" class="w-full border p-2 rounded" />
-        <div class="mt-2 text-right">
-            <button @click="save" class="px-4 py-2 bg-black text-white rounded">Save</button>
-            <button @click="cancel" class="ml-2 px-4 py-2 border rounded">Cancel</button>
-        </div>
-    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 import type { Task } from '~/types/task'
 import { useTaskStore } from '~/stores/useTaskStore'
 
-const props = defineProps<{ task: Task }>()
+const props = defineProps<{ task: Task; editingTaskId: number | null }>()
+const emit = defineEmits(['update:editingTaskId'])
 const store = useTaskStore()
-const edit = ref(false)
 const editText = ref(props.task.statement)
 
+// Start editing the task
+function startEditing() {
+    emit('update:editingTaskId', props.task.id)
+}
+
+// Toggle task completion
 async function toggle() {
     await store.toggle(props.task)
 }
 
+// Confirm task deletion
 function confirmDelete() {
     if (confirm('Delete this task?')) store.remove(props.task.id)
 }
 
+// Save the updated task statement
 async function save() {
-    await store.updateStatement(props.task.id, editText.value)
-    edit.value = false
+    if (editText.value.trim() !== props.task.statement) {
+        await store.updateStatement(props.task.id, editText.value.trim())
+    }
+    emit('update:editingTaskId', null) // Reset editing state
 }
 
+// Cancel editing and revert changes
 function cancel() {
     editText.value = props.task.statement
-    edit.value = false
+    emit('update:editingTaskId', null) // Reset editing state
 }
 </script>
 

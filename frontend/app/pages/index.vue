@@ -25,7 +25,7 @@
                                 @dragenter="onDragEnter(index)"
                                 @dragend="onDragEnd"
                             >
-                                <TaskItem :task="task" />
+                                <TaskItem :task="task" :editingTaskId="editingTaskId" @update:editingTaskId="updateEditingTaskId" />
                             </li>
                         </ul>
                         <div class="fixed bottom-8 w-full max-w-3xl px-4">
@@ -40,55 +40,55 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
-    import { ref, watch, onMounted } from 'vue'
-    import DateSidebar from '~/components/DateSidebar.vue'
-    import Header from '~/components/Header.vue'
-    import TaskInput from '~/components/TaskInput.vue'
-    import TaskItem from '~/components/TaskItem.vue'
-    import { useTaskStore } from '~/stores/useTaskStore'
+import { ref, watch, onMounted } from 'vue'
+import DateSidebar from '~/components/DateSidebar.vue'
+import Header from '~/components/Header.vue'
+import TaskItem from '~/components/TaskItem.vue'
+import { useTaskStore } from '~/stores/useTaskStore'
 
-    const store = useTaskStore()
-    const newText = ref('')
-    const draggedIndex = ref<number | null>(null)
+const store = useTaskStore()
+const newText = ref('')
+const draggedIndex = ref<number | null>(null)
+const editingTaskId = ref<number | null>(null)
 
-    definePageMeta({
-        ssr: false,
-    });
+definePageMeta({
+    ssr: false,
+})
 
-    onMounted(() => {
-        store.fetch()
-    })
+onMounted(() => {
+    store.fetch()
+})
 
+function updateEditingTaskId(taskId: number | null) {
+    editingTaskId.value = taskId
+}
+function add() {
+    if (!newText.value.trim()) return
+    store.add(newText.value.trim())
+    newText.value = ''
+}
 
-    function add() {
-        if (!newText.value.trim()) return
-        store.add(newText.value.trim())
-        newText.value = ''
-    }
+function onDragStart(index: number) {
+    draggedIndex.value = index
+}
 
-    function onDragStart(index: number) {
-        draggedIndex.value = index
-    }
+function onDragEnter(index: number) {
+    if (draggedIndex.value === null || draggedIndex.value === index) return
 
-    function onDragEnter(index: number) {
-        if (draggedIndex.value === null || draggedIndex.value === index) return
+    const draggedTask = store.tasks[draggedIndex.value]
+    if (!draggedTask) return
+    store.tasks.splice(draggedIndex.value, 1)
+    store.tasks.splice(index, 0, draggedTask)
 
-        // Reorder tasks in the array
-        const draggedTask = store.tasks[draggedIndex.value]
-        if (!draggedTask) return
-        store.tasks.splice(draggedIndex.value, 1) // Remove the dragged task
-        store.tasks.splice(index, 0, draggedTask) // Insert it at the new position
+    draggedIndex.value = index
+}
 
-        draggedIndex.value = index // Update the dragged index
-    }
+function onDragEnd() {
+    draggedIndex.value = null
+    store.saveOrder()
+}
 
-    function onDragEnd() {
-        draggedIndex.value = null
-
-        // Save the new order to the backend
-        store.saveOrder()
-    }
-
-    watch(() => store.date, () => store.fetch())
+watch(() => store.date, () => store.fetch())
 </script>
