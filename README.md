@@ -27,6 +27,8 @@ The frontend is located in the `frontend/` directory and is built using Nuxt.js.
 ## Prerequisites
 
 - **Docker** (for Laravel Sail)
+- **Composer** (v2)
+- **PHP** (v8.2)
 - **Node.js** (v23+)
 
 ---
@@ -38,25 +40,28 @@ The frontend is located in the `frontend/` directory and is built using Nuxt.js.
    ```bash
    cd backend
    ```
-2. Start the Laravel Sail environment:
+2. Install dependencies:
    ```bash
-   ./vendor/bin/sail up -d
-   ```
-3. Install dependencies:
-   ```bash
-   ./vendor/bin/sail composer install
+   composer install
    ```
 4. Copy the `.env.example` file to `.env`:
    ```bash
    cp .env.example .env
+5. Start the Laravel Sail environment:
+   ```bash
+   ./vendor/bin/sail up -d
    ```
-5. Generate the application key:
+6. Generate the application key:
    ```bash
    ./vendor/bin/sail artisan key:generate
    ```
-6. Set up the database in the `.env` file and run migrations:
+7. Set up the database in the `.env` file and run migrations:
    ```bash
    ./vendor/bin/sail artisan migrate
+   ```
+8. Run database seeder
+   ```bash
+   ./vendor/bin/sail artisan db:seed
    ```
 
 ### Frontend
@@ -76,7 +81,7 @@ The frontend is located in the `frontend/` directory and is built using Nuxt.js.
 ### Backend
 Start the Laravel Sail environment:
 ```bash
-./vendor/bin/sail up
+./vendor/bin/sail up -d
 ```
 
 ### Frontend
