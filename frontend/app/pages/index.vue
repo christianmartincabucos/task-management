@@ -30,7 +30,7 @@
                         </ul>
                         <div class="fixed bottom-8 w-full max-w-3xl px-4">
                             <div class="flex items-center bg-white border rounded-2xl p-4">
-                                <input v-model="newText" placeholder="What else do you need to do?" class="flex-1 bg-transparent outline-none" />
+                                <input v-model="newText" @keypress.enter="add" placeholder="What else do you need to do?" class="flex-1 bg-transparent outline-none" />
                                 <button @click="add" class="w-12 h-12 rounded-full bg-black text-white">↑</button>
                             </div>
                         </div>

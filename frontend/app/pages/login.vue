@@ -57,7 +57,6 @@ async function login() {
     await authStore.login(email.value, password.value)
 
     if (authStore.token) {
-        isLoading.value = false // Reset loading state
         return navigateTo('/')
     }
 
