@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost',
+      apiBase: process.env.API_BASE || 'http://localhost',
     }
   },
   modules: ['@pinia/nuxt', 'nuxt-lucide-icons']
