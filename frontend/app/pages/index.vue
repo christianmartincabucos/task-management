@@ -90,5 +90,4 @@ function onDragEnd() {
     store.saveOrder()
 }
 
-watch(() => store.date, () => store.fetch())
 </script>
